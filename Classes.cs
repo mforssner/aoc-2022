@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Advent
 {
+    #region Day 7
     public class Day7
     {
         public List<Folder>? List { get; set; }
@@ -64,4 +65,5 @@ namespace Advent
             }
         }
     }
+    #endregion
 }
