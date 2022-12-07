@@ -1,3 +1,3 @@
 ﻿using Advent;
 
-Puzzle p = new (1, 1);
+new Day(7, 1);
