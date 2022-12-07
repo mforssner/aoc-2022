@@ -1,7 +1,11 @@
-﻿namespace Advent;
+﻿using System.Collections.Generic;
+using System.IO;
+
+namespace Advent;
 
 public class Day
 {
+    #region Class stuff
     public Day(int day, int part, string? fileNameOverride = null)
     {
         DayNumber = day;
@@ -33,6 +37,7 @@ public class Day
             _ => "oops"
         };
     }
+    #endregion
 
     #region Day 1
     private string Day1()
@@ -532,53 +537,94 @@ public class Day
     private string Day7()
     {
         var list = InputFile.ToList();
-
-        string currentCommand = "";
-        string currentDirectory = "";
+        //bool ls = false;
+        string currentDirectory;
+        int totalCount = 0;
+        string[] currentPath = Array.Empty<string>();
+        List<string> tempFolderList = new();
+        int tempSize = 0;
+        Day7 day = new();
+        Day7.Folder folder = new(day, "/");
 
         foreach (string line in list)
         {
-            LineHandler();
+            ParseLine(line);
+        }
 
-            void LineHandler()
+        foreach (var f in day.List)
+        {
+            totalCount += f.TotalSize;
+        }
+
+        return totalCount.ToString();
+
+
+
+
+
+
+
+        void ParseLine(string line)
+        {
+            var sSplit = line.Split(' ');
+            if (sSplit[0] == "$") CommandHandler(sSplit);
+            else DefaultHandler(sSplit);
+        }
+
+        void DefaultHandler(string[] sSplit)
+        {
+            if (sSplit[0] == "dir")
             {
-                var sSplit = line.Split(' ');
-                if (sSplit[0] == "$") CommandHandler();
-                else DefaultHandler();
-
-
-                void DefaultHandler()
-                {
-
-                }
-
-
-
-                void CommandHandler()
-                {
-                    if (sSplit is ["$", var cd, var directory])
-                    {
-                        if (cd == "cd")
-                        {
-                            currentCommand = "cd";
-                            DirectoryHandler(directory);
-                        }
-                    }
-                    if (sSplit is ["$", var ls])
-                    {
-                        if (ls == "ls")
-                            currentCommand = "ls";
-                    }
-                }
-
-                void DirectoryHandler(string dir)
-                {
-
-                }
+                tempFolderList.Add(sSplit[1]);
+            }
+            else if (char.IsDigit(sSplit[0][0]))
+            {
+                var temp = int.Parse(sSplit[0]);
+                tempSize += temp;
             }
         }
 
-        return "";
+        void ChangeDirectory(string dir)
+        {
+            if (tempFolderList.Count != 0) folder.AddMoreFolders(day, tempFolderList);
+            folder.TotalSize = tempSize;
+            day.TotalSize += folder.TotalSize;
+            tempSize = 0;
+            tempFolderList.Clear();
+
+            if (dir == "..")
+            {
+                currentPath = currentPath.SkipLast(1).ToArray();
+                folder = folder.Parent;
+            }
+            else
+            {
+                //if (folder.SubFolders != null)
+                //{
+                //    foreach (var f in folder.SubFolders)
+                //    {
+                //        if (f.Name == dir)
+                //            folder = f;
+                //    }
+                //}
+                currentPath = currentPath.Append(dir).ToArray();
+                if (folder.SubFolders != null)
+                    folder = folder.SubFolders.ToList().Find(x => x.Name == currentPath.Last());
+            }
+            currentDirectory = currentPath.Last();
+        }
+
+        void CommandHandler(string[] sSplit)
+        {
+            //ls = false;
+            if (sSplit is ["$", "cd", var directory])
+            {
+                ChangeDirectory(directory);
+            }
+
+            //else if (sSplit is ["$", "ls"])
+            //ls = true;
+        }
     }
     #endregion
 }
