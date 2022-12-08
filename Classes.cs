@@ -39,11 +39,11 @@ namespace Advent
                         if (Parent != null)
                             Parent.TooBig = true;
                     }
-                    size += value;
+                    size = value;
                     if (Parent != null) Parent.Size += value;
                 }
             }
-            private double size = 0;
+            private double size { get; set; } = 0;
             public bool TooBig = false;
             public Folder[]? SubFolders { get; set; } = null;
             public Folder? Parent { get; set; }

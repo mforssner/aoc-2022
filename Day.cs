@@ -545,7 +545,7 @@ public class Day
         double totalCount = 0;
         string[] currentPath = Array.Empty<string>();
         List<string> tempFolderList = new();
-        int tempSize = 0;
+        double tempSize = 0;
         Day7 day = new();
         Day7.Folder folder = new(day, "/");
         int rowCounter = 0;
