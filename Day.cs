@@ -35,6 +35,7 @@ public class Day
             5 => Day5(),
             6 => Day6(),
             7 => Day7(),
+            8 => Day8(),
             _ => "oops"
         };
     }
@@ -72,8 +73,7 @@ public class Day
         return topThreeElvesTotal.ToString();
     }
     #endregion
-    //Refactor 2+3
-    #region Day 2
+    #region Day 2 (refactor)
     private string Day2()
     {
         return Part == 1 ? Day2_Part1() : Day2_Part2();
@@ -254,7 +254,7 @@ public class Day
         return totalPointsMe.ToString();
     }
     #endregion
-    #region Day 3 
+    #region Day 3 (refactor)
     private string Day3()
     {
         var list = InputFile.ToList();
@@ -369,7 +369,6 @@ public class Day
         }
     }
     #endregion
-    ////////////
     #region Day 4
     private string Day4()
     {
@@ -514,14 +513,14 @@ public class Day
                     memory = memory[1..];
                 if (memory.Length == k)
                 {
-                    var check = CheckForDuplicatesDay6(counter, memory);
+                    var check = CheckForDuplicates(counter, memory);
                     if (check != 0) return check;
                 }
             }
             return 0;
         }
 
-        int CheckForDuplicatesDay6(int cn, string input)
+        int CheckForDuplicates(int cn, string input)
         {
             for (int i = 0; i < input.Length; i++)
             {
@@ -637,6 +636,18 @@ public class Day
             if (tempSize != 0)
                 folder.Size = tempSize;
         }
+    }
+    #endregion
+    #region Day 8
+    private string Day8()
+    {
+        var list = InputFile;
+        int visible = 0;
+        foreach (var line in list)
+        {
+
+        }
+        return visible.ToString();
     }
     #endregion
 }
