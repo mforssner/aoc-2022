@@ -641,13 +641,99 @@ public class Day
     #region Day 8
     private string Day8()
     {
-        var list = InputFile;
+        var grid = MakeGrid();
         int visible = 0;
-        foreach (var line in list)
-        {
+        //int visible = 392 +  97 * 97; //99x99 + alla kanter är alltid synliga
+        GridMethod(grid);
 
-        }
         return visible.ToString();
+
+
+        void GridMethod(int[][] grid)
+        {
+            int l = grid.Length;
+            int x = 0;
+            int y = 0;
+
+            foreach (var row in grid)
+            {
+                foreach (var value in row)
+                {
+                    if (CheckAllDirections(x, y, value)) visible++;
+                    x++;
+                    if (x == l) x = 0;
+                }
+                y++;
+                if (y == l) y = 0;
+            }
+
+
+            bool CheckAllDirections(int col, int row, int input)
+            {
+                if (LeftToRight(row, col, input)
+                    || UpToDown(row, col, input)
+                    || RightToLeft(row, col, input)
+                    || DownToUp(row, col, input))
+                {
+                    return true;
+                }
+                else return false;
+            }
+
+
+            bool LeftToRight(int row, int colPos, int input)
+            {
+                for (int col = colPos; col < l; col++)
+                {
+                    if (input < grid[row][col]) return false;
+                }
+                return true;
+            }
+
+            bool UpToDown(int rowPos, int col, int input)
+            {
+                for (int row = rowPos; row < l; row++)
+                {
+                    if (input == grid[row][col]) return false;
+                }
+                return true;
+            }
+
+            bool RightToLeft(int row, int colPos, int input)
+            {
+                for (int col = l-1; col >= colPos; col--)
+                {
+                    if (input == grid[row][col]) return false;
+                }
+                return true;
+            }
+
+            bool DownToUp(int rowPos, int col, int input)
+            {
+                for (int row = l-1; row >= rowPos; row--)
+                {
+                    if (input == grid[row][col]) return false;
+                }
+                return true;
+            }
+        }
+
+        int[][] MakeGrid()
+        {
+            string[] list = InputFile;
+            List<int[]> gridList = new();
+            List<int> rowList = new();
+            foreach (var row in list)
+            {
+                foreach (var c in row)
+                {
+                    rowList.Add(int.Parse(c.ToString()));
+                }
+                gridList.Add(rowList.ToArray());
+                rowList.Clear();
+            }
+            return gridList.ToArray();
+        }
     }
     #endregion
 }
