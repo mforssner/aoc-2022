@@ -667,55 +667,53 @@ public class Day
                 if (y == l) y = 0;
             }
 
-
             bool CheckAllDirections(int col, int row, int input)
             {
-                if (LeftToRight(row, col, input)
-                    || UpToDown(row, col, input)
-                    || RightToLeft(row, col, input)
-                    || DownToUp(row, col, input))
+                if (CheckLeft(row, col, input)
+                    || CheckRight(row, col, input)
+                    || CheckUp(row, col, input)
+                    || CheckDown(row, col, input))
                 {
                     return true;
                 }
                 else return false;
             }
 
-
-            bool LeftToRight(int row, int colPos, int input)
+            bool CheckLeft(int row, int colPos, int input)
             {
-                for (int col = colPos; col < l; col++)
+                for (int col = colPos-1; col >= 0; col--)
                 {
-                    if (input < grid[row][col]) return false;
+                    if (input <= grid[row][col]) return false;
                 }
                 return true;
             }
 
-            bool UpToDown(int rowPos, int col, int input)
+            bool CheckRight(int row, int colPos, int input)
             {
-                for (int row = rowPos; row < l; row++)
+                for (int col = colPos+1; col < l; col++)
                 {
-                    if (input == grid[row][col]) return false;
+                    if (input <= grid[row][col]) return false;
                 }
                 return true;
             }
 
-            bool RightToLeft(int row, int colPos, int input)
+            bool CheckUp(int rowPos, int col, int input)
             {
-                for (int col = l-1; col >= colPos; col--)
+                for (int row = rowPos-1; row >= 0; row--)
                 {
-                    if (input == grid[row][col]) return false;
+                    if (input <= grid[row][col]) return false;
                 }
                 return true;
             }
 
-            bool DownToUp(int rowPos, int col, int input)
+            bool CheckDown(int rowPos, int col, int input)
             {
-                for (int row = l-1; row >= rowPos; row--)
+                for (int row = rowPos+1; row < l; row++)
                 {
-                    if (input == grid[row][col]) return false;
+                    if (input <= grid[row][col]) return false;
                 }
                 return true;
-            }
+            } 
         }
 
         int[][] MakeGrid()
