@@ -568,7 +568,8 @@ public class Day
             if (f.Size >= 30000000)
             {
                 d.Add(f.Size);
-                Console.WriteLine($"{allAncestors}{f.Name} {x} {f.Size}");
+
+                Console.WriteLine($"{allAncestors}{f.Name} {f.Size}");
             }
 
             if (Part == 1 && !f.TooBig) totalCount += f.Size;
@@ -643,10 +644,11 @@ public class Day
     {
         var grid = MakeGrid();
         int visible = 0;
-        //int visible = 392 +  97 * 97; //99x99 + alla kanter är alltid synliga
+        int highestScenicValue = 0;
         GridMethod(grid);
 
-        return visible.ToString();
+        if (Part == 1) return visible.ToString();
+        else return highestScenicValue.ToString();
 
 
         void GridMethod(int[][] grid)
@@ -669,50 +671,63 @@ public class Day
 
             bool CheckAllDirections(int col, int row, int input)
             {
-                if (CheckLeft(row, col, input)
-                    || CheckRight(row, col, input)
-                    || CheckUp(row, col, input)
-                    || CheckDown(row, col, input))
+                int templol = Part == 2 ? CheckLeft(row, col, input) * CheckRight(row, col, input) * CheckUp(row, col, input) * CheckDown(row, col, input) : CheckLeft(row, col, input) + CheckRight(row, col, input) + CheckUp(row, col, input) + CheckDown(row, col, input);
+
+                if (templol > 0)
                 {
+                    if (highestScenicValue < templol)
+                    {
+                        highestScenicValue = templol;
+                        Console.WriteLine($"col {col} row {row} scenic value {highestScenicValue}");
+                    }
+
                     return true;
                 }
                 else return false;
             }
 
-            bool CheckLeft(int row, int colPos, int input)
+            int CheckLeft(int rowPos, int colPos, int input)
             {
+                int distance = Part == 2 ? 0 : 1;
                 for (int col = colPos-1; col >= 0; col--)
                 {
-                    if (input <= grid[row][col]) return false;
+                    distance++;
+                    if (input <= grid[rowPos][col]) return Part == 2 ? distance : 0;
                 }
-                return true;
+                return distance;
             }
 
-            bool CheckRight(int row, int colPos, int input)
+            int CheckRight(int rowPos, int colPos, int input)
             {
+                int distance = Part == 2 ? 0 : 1;
                 for (int col = colPos+1; col < l; col++)
                 {
-                    if (input <= grid[row][col]) return false;
+                    distance++;
+                    if (input <= grid[rowPos][col]) return Part == 2 ? distance : 0;
                 }
-                return true;
+                return distance;
             }
 
-            bool CheckUp(int rowPos, int col, int input)
+            int CheckUp(int rowPos, int colPos, int input)
             {
+                int distance = Part == 2 ? 0 : 1;
                 for (int row = rowPos-1; row >= 0; row--)
                 {
-                    if (input <= grid[row][col]) return false;
+                    distance++;
+                    if (input <= grid[row][colPos]) return Part == 2 ? distance : 0;
                 }
-                return true;
+                return distance;
             }
 
-            bool CheckDown(int rowPos, int col, int input)
+            int CheckDown(int rowPos, int colPos, int input)
             {
+                int distance = Part == 2 ? 0 : 1;
                 for (int row = rowPos+1; row < l; row++)
                 {
-                    if (input <= grid[row][col]) return false;
+                    distance++;
+                    if (input <= grid[row][colPos]) return Part == 2 ? distance : 0;
                 }
-                return true;
+                return distance;
             } 
         }
 
