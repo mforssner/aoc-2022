@@ -9,8 +9,7 @@ namespace Advent
     #region Day 7
     public class Day7
     {
-        public List<Folder>? List { get; set; }
-        public int TotalSize { get; set; }
+        public List<Folder> List { get; set; }
         public Day7()
         {
             List = new List<Folder>();
@@ -26,28 +25,25 @@ namespace Advent
             }
 
             public string Name { get; set; }
-            public int TotalSize
+            public double Size
             {
                 get
                 {
-                    return totalSize;
+                    return size;
                 }
                 set
                 {
-                    if (TooBig) return;
-                    else if (totalSize + value > 100000)
+                    if (size + value > 100000)
                     {
                         TooBig = true;
-                        totalSize = 0;
+                        if (Parent != null)
+                            Parent.TooBig = true;
                     }
-                    else
-                    {
-                        totalSize += value;
-                        if (Parent != null && !Parent.TooBig) Parent.TotalSize += value;
-                    }
+                    size += value;
+                    if (Parent != null) Parent.Size += value;
                 }
             }
-            private int totalSize = 0;
+            private double size = 0;
             public bool TooBig = false;
             public Folder[]? SubFolders { get; set; } = null;
             public Folder? Parent { get; set; }
@@ -55,7 +51,7 @@ namespace Advent
             public void AddMoreFolders(Day7 day, List<string>? list)
             {
                 if (list == null) return;
-                var array = new Folder[0];
+                var array = Array.Empty<Folder>();
                 foreach (string name in list)
                 {
                     var folder = new Folder(day, name, this);

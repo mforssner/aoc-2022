@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Advent;
 
@@ -71,6 +72,7 @@ public class Day
         return topThreeElvesTotal.ToString();
     }
     #endregion
+    //Refactor 2+3
     #region Day 2
     private string Day2()
     {
@@ -252,7 +254,7 @@ public class Day
         return totalPointsMe.ToString();
     }
     #endregion
-    #region Day 3
+    #region Day 3 
     private string Day3()
     {
         var list = InputFile.ToList();
@@ -367,6 +369,7 @@ public class Day
         }
     }
     #endregion
+    ////////////
     #region Day 4
     private string Day4()
     {
@@ -539,36 +542,50 @@ public class Day
         var list = InputFile.ToList();
         //bool ls = false;
         string currentDirectory;
-        int totalCount = 0;
+        double totalCount = 0;
         string[] currentPath = Array.Empty<string>();
         List<string> tempFolderList = new();
         int tempSize = 0;
         Day7 day = new();
         Day7.Folder folder = new(day, "/");
+        int rowCounter = 0;
 
         foreach (string line in list)
-        {
             ParseLine(line);
-        }
 
-        foreach (var f in day.List)
+        List<double> d = new();
+
+        foreach (var f in day.List!)
         {
-            totalCount += f.TotalSize;
+            string allAncestors = "";
+            var temp = f;
+            while (temp.Parent != null)
+            {
+                allAncestors = @$"{temp.Parent.Name}/{allAncestors}";
+                temp = temp.Parent;
+            }
+            var x = f.TooBig ? "Big" : "Small";
+
+            if (f.Size >= 30000000)
+            {
+                d.Add(f.Size);
+                Console.WriteLine($"{allAncestors}{f.Name} {x} {f.Size}");
+            }
+
+            if (Part == 1 && !f.TooBig) totalCount += f.Size;
         }
+        var closest = d.OrderBy(item => Math.Abs(30000000 - item)).First().ToString();
 
-        return totalCount.ToString();
-
-
-
-
-
-
+        if (Part == 1) return totalCount.ToString();
+        else return closest;
 
         void ParseLine(string line)
         {
+            rowCounter++;
             var sSplit = line.Split(' ');
             if (sSplit[0] == "$") CommandHandler(sSplit);
             else DefaultHandler(sSplit);
+            if (rowCounter == 1052) LastRow();
         }
 
         void DefaultHandler(string[] sSplit)
@@ -587,43 +604,38 @@ public class Day
         void ChangeDirectory(string dir)
         {
             if (tempFolderList.Count != 0) folder.AddMoreFolders(day, tempFolderList);
-            folder.TotalSize = tempSize;
-            day.TotalSize += folder.TotalSize;
+            if (tempSize != 0)
+                folder.Size = tempSize;
             tempSize = 0;
             tempFolderList.Clear();
 
             if (dir == "..")
             {
                 currentPath = currentPath.SkipLast(1).ToArray();
-                folder = folder.Parent;
+                folder = folder.Parent!;
             }
             else
             {
-                //if (folder.SubFolders != null)
-                //{
-                //    foreach (var f in folder.SubFolders)
-                //    {
-                //        if (f.Name == dir)
-                //            folder = f;
-                //    }
-                //}
                 currentPath = currentPath.Append(dir).ToArray();
                 if (folder.SubFolders != null)
-                    folder = folder.SubFolders.ToList().Find(x => x.Name == currentPath.Last());
+                    folder = folder.SubFolders.ToList().Find(x => x.Name == currentPath.Last())!;
             }
             currentDirectory = currentPath.Last();
         }
 
         void CommandHandler(string[] sSplit)
         {
-            //ls = false;
             if (sSplit is ["$", "cd", var directory])
             {
                 ChangeDirectory(directory);
             }
+        }
 
-            //else if (sSplit is ["$", "ls"])
-            //ls = true;
+        void LastRow()
+        {
+            if (tempFolderList.Count != 0) folder.AddMoreFolders(day, tempFolderList);
+            if (tempSize != 0)
+                folder.Size = tempSize;
         }
     }
     #endregion
