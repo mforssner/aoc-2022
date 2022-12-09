@@ -30,33 +30,32 @@ namespace Advent
                 get { return currentSize; }
                 set
                 {
-                    if (InitialSize == 0)
+                    //if (InitialSize == 0)
+                    //{
+                    //    if (InitialSize + value > 100000)
+                    //    {
+                    //        TooBig = true;
+                    //        if (Parent != null)
+                    //            Parent.TooBig = true;
+                    //    }
+                    //    InitialSize = value;
+                    //    currentSize = value;
+                    //}
+                    //else
+                    //{
+                    if (currentSize + value > 100000)
                     {
-                        if (InitialSize + value > 100000)
-                        {
-                            TooBig = true;
-                            if (Parent != null)
-                                Parent.TooBig = true;
-                        }
-                        InitialSize = value;
-                        currentSize = value;
+                        TooBig = true;
+                        if (Parent != null) Parent.TooBig = true;
                     }
-                    else
-                    {
-                        if (currentSize + value > 100000)
-                        {
-                            TooBig = true;
-                            if (Parent != null)
-                                Parent.TooBig = true;
-                        }
-                        currentSize = value;
-                    }
-                    if (Parent != null) Parent.Size += value;
+                    currentSize += value;
+                    //}
+                    if (Parent != null) Parent.Size = value;
                 }
             }
             private int currentSize = 0;
             public bool TooBig = false;
-            private int InitialSize { get; set; } = 0;
+            //private int InitialSize { get; set; } = 0;
             public Folder[]? SubFolders { get; set; } = null;
             public Folder? Parent { get; set; }
 
