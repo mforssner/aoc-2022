@@ -25,26 +25,38 @@ namespace Advent
             }
 
             public string Name { get; set; }
-            public double Size
+            public int Size
             {
-                get
-                {
-                    return size;
-                }
+                get { return currentSize; }
                 set
                 {
-                    if (size + value > 100000)
+                    if (InitialSize == 0)
                     {
-                        TooBig = true;
-                        if (Parent != null)
-                            Parent.TooBig = true;
+                        if (InitialSize + value > 100000)
+                        {
+                            TooBig = true;
+                            if (Parent != null)
+                                Parent.TooBig = true;
+                        }
+                        InitialSize = value;
+                        currentSize = value;
                     }
-                    size = value;
+                    else
+                    {
+                        if (currentSize + value > 100000)
+                        {
+                            TooBig = true;
+                            if (Parent != null)
+                                Parent.TooBig = true;
+                        }
+                        currentSize = value;
+                    }
                     if (Parent != null) Parent.Size += value;
                 }
             }
-            private double size { get; set; } = 0;
+            private int currentSize = 0;
             public bool TooBig = false;
+            private int InitialSize { get; set; } = 0;
             public Folder[]? SubFolders { get; set; } = null;
             public Folder? Parent { get; set; }
 

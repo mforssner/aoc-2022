@@ -36,6 +36,7 @@ public class Day
             6 => Day6(),
             7 => Day7(),
             8 => Day8(),
+            9 => Day9(),
             _ => "oops"
         };
     }
@@ -535,16 +536,17 @@ public class Day
         }
     }
     #endregion
-    #region Day 7
+    #region Day 7 (Finish part 2!)
     private string Day7()
     {
         var list = InputFile.ToList();
         //bool ls = false;
         string currentDirectory;
-        double totalCount = 0;
+        int totalCount = 0;
+        int totalSizeOfRoot = 0;
         string[] currentPath = Array.Empty<string>();
-        List<string> tempFolderList = new();
-        double tempSize = 0;
+        List<string> foldersInCurrentFolder = new();
+        int sizeOfCurrentFolder = 0;
         Day7 day = new();
         Day7.Folder folder = new(day, "/");
         int rowCounter = 0;
@@ -552,9 +554,81 @@ public class Day
         foreach (string line in list)
             ParseLine(line);
 
-        List<double> d = new();
+        List<int> d = new();
 
-        foreach (var f in day.List!)
+        foreach (Day7.Folder? f in day.List!)
+        {
+            //DebugPrintAllFolders(f);
+            if (Part == 1 && !f.TooBig) totalCount += f.Size;
+            if (f.Size >= 30000000) d.Add(f.Size);
+        }
+
+        Console.WriteLine(@$"/ dir: {totalSizeOfRoot} (correct value)");
+        Console.WriteLine(@$"/ dir: {day.List[0].Size} (from list)");
+
+        var closest = Part == 2 ? d.OrderBy(item => Math.Abs(30000000 - item)).First().ToString() : "";
+
+        if (Part == 1) return totalCount.ToString();
+        else return closest;
+
+        void ParseLine(string line)
+        {
+            rowCounter++;
+            var s = line.Split(' ');
+            if (s[0] == "$") CommandHandler(s);
+            else DefaultHandler(s);
+            if (rowCounter == 1052) LastRow();
+        }
+
+        void CommandHandler(string[] s)
+        {
+            if (s is ["$", "cd", var directory])
+            {
+                if (foldersInCurrentFolder.Count != 0) folder.AddMoreFolders(day, foldersInCurrentFolder);
+                if (sizeOfCurrentFolder != 0)
+                    folder.Size = sizeOfCurrentFolder;
+                totalSizeOfRoot += sizeOfCurrentFolder;
+                sizeOfCurrentFolder = 0;
+                foldersInCurrentFolder.Clear();
+
+                if (directory == "..")
+                {
+                    currentPath = currentPath.SkipLast(1).ToArray();
+                    folder = folder.Parent!;
+                }
+                else
+                {
+                    currentPath = currentPath.Append(directory).ToArray();
+                    if (folder.SubFolders != null)
+                        folder = folder.SubFolders.ToList().Find(x => x.Name == currentPath.Last())!;
+                }
+                currentDirectory = currentPath.Last();
+            }
+        }
+
+        void DefaultHandler(string[] s)
+        {
+            if (s[0] == "dir")
+            {
+                foldersInCurrentFolder.Add(s[1]);
+            }
+            else //if (char.IsDigit(sSplit[0][0]))
+            {
+                var temp = int.Parse(s[0]);
+                sizeOfCurrentFolder += temp;
+            }
+        }
+
+        void LastRow()
+        {
+            if (foldersInCurrentFolder.Count != 0) folder.AddMoreFolders(day, foldersInCurrentFolder);
+            if (sizeOfCurrentFolder != 0)
+                folder.Size = sizeOfCurrentFolder;
+            sizeOfCurrentFolder = 0;
+            foldersInCurrentFolder.Clear();
+        }
+
+        void DebugPrintAllFolders(Day7.Folder f)
         {
             string allAncestors = "";
             var temp = f;
@@ -563,79 +637,8 @@ public class Day
                 allAncestors = @$"{temp.Parent.Name}/{allAncestors}";
                 temp = temp.Parent;
             }
-            var x = f.TooBig ? "Big" : "Small";
 
-            if (f.Size >= 30000000)
-            {
-                d.Add(f.Size);
-
-                Console.WriteLine($"{allAncestors}{f.Name} {f.Size}");
-            }
-
-            if (Part == 1 && !f.TooBig) totalCount += f.Size;
-        }
-        var closest = d.OrderBy(item => Math.Abs(30000000 - item)).First().ToString();
-
-        if (Part == 1) return totalCount.ToString();
-        else return closest;
-
-        void ParseLine(string line)
-        {
-            rowCounter++;
-            var sSplit = line.Split(' ');
-            if (sSplit[0] == "$") CommandHandler(sSplit);
-            else DefaultHandler(sSplit);
-            if (rowCounter == 1052) LastRow();
-        }
-
-        void DefaultHandler(string[] sSplit)
-        {
-            if (sSplit[0] == "dir")
-            {
-                tempFolderList.Add(sSplit[1]);
-            }
-            else if (char.IsDigit(sSplit[0][0]))
-            {
-                var temp = int.Parse(sSplit[0]);
-                tempSize += temp;
-            }
-        }
-
-        void ChangeDirectory(string dir)
-        {
-            if (tempFolderList.Count != 0) folder.AddMoreFolders(day, tempFolderList);
-            if (tempSize != 0)
-                folder.Size = tempSize;
-            tempSize = 0;
-            tempFolderList.Clear();
-
-            if (dir == "..")
-            {
-                currentPath = currentPath.SkipLast(1).ToArray();
-                folder = folder.Parent!;
-            }
-            else
-            {
-                currentPath = currentPath.Append(dir).ToArray();
-                if (folder.SubFolders != null)
-                    folder = folder.SubFolders.ToList().Find(x => x.Name == currentPath.Last())!;
-            }
-            currentDirectory = currentPath.Last();
-        }
-
-        void CommandHandler(string[] sSplit)
-        {
-            if (sSplit is ["$", "cd", var directory])
-            {
-                ChangeDirectory(directory);
-            }
-        }
-
-        void LastRow()
-        {
-            if (tempFolderList.Count != 0) folder.AddMoreFolders(day, tempFolderList);
-            if (tempSize != 0)
-                folder.Size = tempSize;
+            Console.WriteLine($"{allAncestors}{f.Name} {f.Size}");
         }
     }
     #endregion
@@ -746,6 +749,27 @@ public class Day
                 rowList.Clear();
             }
             return gridList.ToArray();
+        }
+    }
+    #endregion
+    #region Day 9
+    private string Day9()
+    {
+        var list = InputFile.ToList();
+        foreach (var line in list)
+        {
+            LineHandler(line);
+        }
+
+        return "";
+
+        static void LineHandler(string line)
+        {
+            var sp = line.Split(" ");
+            var left = sp[0];
+            var right = sp[1];
+
+
         }
     }
     #endregion
