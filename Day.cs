@@ -703,62 +703,36 @@ public class Day
         int x = 1;
         int sum = 0;
         var crtOutput = "\n";
-        int[][] renderInfo = new int[240][];
 
-        foreach (string line in list)
-            LineReader(line);
-
-        void LineReader(string instruction)
+        foreach (string instruction in list)
         {
-            RunCycle();
-            if (instruction == "noop") return;
-            int addx = int.Parse(instruction.Split(' ')[1]);
-
-            RunCycle();
-            x += addx;
+            StartNewCycle();
+            if (instruction == "noop") continue;
+            StartNewCycle();
+            x += int.Parse(instruction.Split(' ')[1]);
         }
-
-        void RunCycle()
-        {
-            cycle++;
-
-            if (Part == 1 && cycle == 20 || (cycle - 20) % 40 == 0) sum += cycle * x;
-
-            var temp = cycle > 40 ? cycle % 40 : cycle;
-            renderInfo[cycle - 1] = new int[] { temp, x };
-        }
-
-
-        foreach (var info in renderInfo)
-        {
-            if (IsLit(info)) crtOutput += "#";
-            else crtOutput += ".";
-
-            if (info[0] % 40 == 0) crtOutput += "\n";
-        }
-
 
         return Part == 1 ? sum.ToString() : crtOutput;
 
-        bool IsLit(int[] pair)
+        void StartNewCycle()
         {
-            var c = pair[0] - 1;
-            var sprite = pair[1];
+            cycle++;
+            if (Part == 1 && cycle == 20 || (cycle - 20) % 40 == 0) sum += cycle * x;
+            PrintToCRT(cycle > 40 ? cycle % 40 : cycle, x);
+        }
 
-            //if (sprite == 0)
-            //{
-            //    sprite++;
-            //}
-            if (sprite == 39)
+        void PrintToCRT(int t, int x)
+        {
+            if (IsLit()) crtOutput += "#";
+            else crtOutput += ".";
+            if (t % 40 == 0) crtOutput += "\n";
+
+            bool IsLit()
             {
-                sprite--;
+                var c = t - 1;
+                if (c < 0) return false;
+                return (c >= x - 1 && c <= x + 1);
             }
-            //if (sprite < 0)
-            //{
-            //    sprite = 0;
-            //}
-
-            return (c >= sprite - 1 && c <= sprite + 1);
         }
     }
     #endregion
