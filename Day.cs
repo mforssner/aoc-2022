@@ -40,6 +40,7 @@ public class Day
             7 => Day7(),
             8 => Day8(),
             9 => Day9(),
+            10 => Day10(),
             _ => "oops"
         };
     }
@@ -735,6 +736,13 @@ public class Day
 
 
         }
+    }
+    #endregion
+    #region Day 10
+    private string Day10()
+    {
+        var list = InputFile.ToList();
+        return "";
     }
     #endregion
 }

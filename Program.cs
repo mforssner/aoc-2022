@@ -1,3 +1,3 @@
 ﻿using Advent;
 
-new Day(9, 1);
+new Day(10, 1);
