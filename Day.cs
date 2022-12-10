@@ -39,7 +39,7 @@ public class Day
             8 => Day8(),
             9 => Day9(),
             10 => Day10(),
-            //11 => Day11(),
+            11 => Day11(),
             //12 => Day12(),
             //13 => Day13(),
             //14 => Day14(),
@@ -91,7 +91,7 @@ public class Day
         return topThreeElvesTotal.ToString();
     }
     #endregion
-    #region Day 2 (refactor)
+    #region Day 2 (refactor needed!)
     private string Day2()
     {
         return Part == 1 ? Day2_Part1() : Day2_Part2();
@@ -573,9 +573,9 @@ public class Day
         //}
     }
 
-    
+
     #endregion
-    #region Day 8
+    #region Day 8 (refactor)
     private string Day8()
     {
         var grid = MakeGrid();
@@ -597,8 +597,8 @@ public class Day
             if (y == l) y = 0;
         }
 
-        if (Part == 1) return visible.ToString();
-        else /* Part 2 */ return highestScenicValue.ToString();
+        return Part == 1 ?  visible.ToString():
+            /* Part == 2 */ highestScenicValue.ToString();
 
 
         void CheckAllDirections(int col, int row, int input)
@@ -674,24 +674,73 @@ public class Day
         }
     }
     #endregion
-    #region Day 9
+    #region Day 9 (Part 2 not done)
     private string Day9()
     {
         var list = InputFile.ToList();
+        var grid = MakeGrid();
+        var headPos = new int[]{ 500, 500 };
+        var tailPos = new int[]{ 500, 500 };
+        var lastHeadPos = new int[] { 500, 500 };
+        int visitedAtleastOnce = 1; //Starting position included
+
         foreach (var line in list)
         {
-            LineHandler(line);
+            var sp = line.Split(" ");
+            var direction = sp[0];
+            int steps = int.Parse(sp[1]);
+
+            for (int i = 0; i < steps; i++)
+            {
+                lastHeadPos[0] = headPos[0];
+                lastHeadPos[1] = headPos[1];
+                MoveHead(direction);
+                MoveTail();
+            }
         }
 
-        return "";
+        return visitedAtleastOnce.ToString();
 
-        static void LineHandler(string line)
+
+        void MoveHead(string input)
         {
-            var sp = line.Split(" ");
-            var left = sp[0];
-            var right = sp[1];
+             switch (input)
+             {
+                case "U":
+                    headPos[0]--;
+                    break;
+                case "D":
+                    headPos[0]++;
+                    break;
+                case "L":
+                    headPos[1]--;
+                    break;
+                case "R":
+                    headPos[1]++;
+                    break;
+             }
+        }
 
+        void MoveTail()
+        {
+            if (tailPos[0] > headPos[0] + 1 || tailPos[0] < headPos[0] - 1 || tailPos[1] > headPos[1] + 1 || tailPos[1] < headPos[1] - 1)
+            {
+                tailPos[0] = lastHeadPos[0];
+                tailPos[1] = lastHeadPos[1];
+                if (grid[tailPos[0]][tailPos[1]] == 0)
+                {
+                    grid[tailPos[0]][tailPos[1]] = 1;
+                    visitedAtleastOnce++;
+                }
+            }
+        }
 
+        int[][] MakeGrid()
+        {
+            int[][] grid = new int[1000][];
+            for (int i = 0; i < 1000; i++)
+                grid[i] = new int[1000];
+            return grid;
         }
     }
     #endregion
@@ -736,6 +785,19 @@ public class Day
         }
     }
     #endregion
+    #region Day 11 (Not done)
+    private string Day11()
+    {
+        var list = InputFile.ToList();
+        foreach (var line in list)
+        {
+
+        }
+
+        return "";
+    }
+    #endregion
+
 
     #region Day Template
     private string DayX()
