@@ -12,7 +12,10 @@ public class Day
         DayNumber = day;
         Part = part;
         InputFile = MakeList(fileNameOverride);
+        var watch = System.Diagnostics.Stopwatch.StartNew();
         Console.WriteLine($"DAY {DayNumber} PART {Part}: " + GetSolution());
+        watch.Stop();
+        Console.WriteLine($"RUNTIME: {watch.ElapsedMilliseconds}ms");
     }
 
     private int DayNumber { get; set; }
@@ -51,10 +54,9 @@ public class Day
         int topThreeElvesTotal = 0;
         foreach (string line in startingList)
         {
-            if (line != "")
+            if (line.Any())
             {
-                int calories = int.Parse(line);
-                sumOfCalories += calories;
+                sumOfCalories += int.Parse(line);
             }
             else
             {
@@ -63,10 +65,11 @@ public class Day
             }
         }
 
-        for (int i = 1; i <= 3; i++)
+        if (Part == 1) return listOfSums.Max().ToString();
+
+        for (int i = 0; i < 3; i++)
         {
             int maxValue = listOfSums.Max();
-            if (Part == 1) return maxValue.ToString();
             topThreeElvesTotal += maxValue;
             listOfSums.RemoveAt(listOfSums.IndexOf(maxValue));
         }
@@ -378,32 +381,27 @@ public class Day
         foreach (string line in list)
         {
             var pair = line.Split(',');
-            var range1 = pair[0].Split('-');
-            var range2 = pair[1].Split('-');
+            var a = pair[0].Split('-');
+            var b = pair[1].Split('-');
 
-            if (Part == 1)
+            if (Part == 1) 
             {
-                if (OneContainsTwo())
-                    total++;
-                else if (TwoContainsOne())
-                    total++;
+                if (AContainsB() || BContainsA()) total++;
             }
 
-            else if (IsAnyOverlap())
-                total++;
+            else if (IsAnyOverlap()) total++;
 
-            bool OneContainsTwo()
+            bool AContainsB()
             {
-                return int.Parse(range1[0]) <= int.Parse(range2[0]) && int.Parse(range1[1]) >= int.Parse(range2[1]);
+                return int.Parse(a[0]) <= int.Parse(b[0]) && int.Parse(a[1]) >= int.Parse(b[1]);
             }
-            bool TwoContainsOne()
+            bool BContainsA()
             {
-                return int.Parse(range2[0]) <= int.Parse(range1[0]) && int.Parse(range2[1]) >= int.Parse(range1[1]);
+                return int.Parse(b[0]) <= int.Parse(a[0]) && int.Parse(b[1]) >= int.Parse(a[1]);
             }
             bool IsAnyOverlap()
             {
-                return int.Parse(range1[1]) >= int.Parse(range2[0])
-                    && int.Parse(range2[1]) >= int.Parse(range1[0]);
+                return int.Parse(a[1]) >= int.Parse(b[0]) && int.Parse(b[1]) >= int.Parse(a[0]);
             }
         }
         return total.ToString();
@@ -426,23 +424,24 @@ public class Day
             {
                 for (int i = 1; i <= move; i++)
                 {
-                    grid[to] = grid[to] += grid[from][(grid[from].Length - 1)..];
-                    grid[from] = grid[from][..(grid[from].Length - 1)];
+                    grid[to] = grid[to] += grid[from][^1..];
+                    grid[from] = grid[from][..^1];
                 }
             }
             else
             {
-                grid[to] = grid[to] += grid[from][(grid[from].Length - move)..];
-                grid[from] = grid[from][..(grid[from].Length - move)];
+                grid[to] = grid[to] += grid[from][^move..];
+                grid[from] = grid[from][..^move];
             }
         }
 
         foreach (string column in grid)
         {
-            finalString += column[(column.Length - 1)..];
+            finalString += column[^1..];
         }
 
         return finalString;
+
 
         static string[] PopulateLists(string[] list)
         {
@@ -456,38 +455,30 @@ public class Day
             string string8 = "";
             string string9 = "";
 
-            int columnCounter = 1;
-            int charInColumn = 0;
-            int rowCounter = 0;
-            for (int i = 7; i >= 0; i--)
+            foreach (string row in list.Reverse())
             {
-                foreach (char ch in list[i])
-                {
-                    rowCounter++;
-                    charInColumn++;
-                    if (rowCounter == 35)
-                    {
-                        rowCounter = 0;
-                        charInColumn = 0;
-                        columnCounter = 1;
-                    }
+                int position = 0;
+                int column = 1;
 
-                    if (charInColumn == 2 && ch != ' ')
+                foreach (char ch in row)
+                {
+                    position++;
+                    if (position == 2 && ch != ' ')
                     {
-                        if (columnCounter == 1) string1 += ch;
-                        if (columnCounter == 2) string2 += ch;
-                        if (columnCounter == 3) string3 += ch;
-                        if (columnCounter == 4) string4 += ch;
-                        if (columnCounter == 5) string5 += ch;
-                        if (columnCounter == 6) string6 += ch;
-                        if (columnCounter == 7) string7 += ch;
-                        if (columnCounter == 8) string8 += ch;
-                        if (columnCounter == 9) string9 += ch;
+                        if (column == 1) string1 += ch;
+                        if (column == 2) string2 += ch;
+                        if (column == 3) string3 += ch;
+                        if (column == 4) string4 += ch;
+                        if (column == 5) string5 += ch;
+                        if (column == 6) string6 += ch;
+                        if (column == 7) string7 += ch;
+                        if (column == 8) string8 += ch;
+                        if (column == 9) string9 += ch;
                     }
-                    if (charInColumn == 4)
+                    if (position == 4)
                     {
-                        columnCounter++;
-                        charInColumn = 0;
+                        column++;
+                        position = 0;
                     }
                 }
             }
@@ -539,11 +530,8 @@ public class Day
     #region Day 7
     private string Day7()
     {
-        var list = InputFile.ToList();
-        string currentDirectory;
+        List<string> list = InputFile.ToList();
         int totalCount = 0;
-        int totalSizeOfRoot = 0;
-        string[] currentPath = Array.Empty<string>();
         List<string> foldersInCurrentFolder = new();
         int sizeOfCurrentFolder = 0;
         Day7 day = new();
@@ -562,40 +550,33 @@ public class Day
             if (Part == 1 && !f.TooBig) totalCount += f.Size;
             if (Part == 2 && f.Size >= spaceNeeded) d.Add(f.Size);
         }
+        string closest = Part == 2 ? d.OrderBy(item => Math.Abs(spaceNeeded - item)).First().ToString() : "";
 
-        var closest = Part == 2 ? d.OrderBy(item => Math.Abs(spaceNeeded - item)).First().ToString() : "";
+        if (Part == 1)    return totalCount.ToString();
+        else /* Part 2 */ return closest;
 
-        if (Part == 1) return totalCount.ToString();
-        else return closest;
 
         void ParseLine(string line)
         {
             rowCounter++;
-            var s = line.Split(' ');
+            string[] s = line.Split(' ');
             if (s[0] == "$") CommandHandler(s);
             else DefaultHandler(s);
-            if (line == list[list.Count-1]) 
+
+            if (line == list[^1]) //last line in list
                 FolderLogic();
         }
 
         void CommandHandler(string[] s)
         {
-            if (s is ["$", "cd", var directory])
+            if (s is ["$", "cd", string dir])
             {
                 FolderLogic();
 
-                if (directory == "..")
-                {
-                    currentPath = currentPath.SkipLast(1).ToArray();
+                if (dir == "..") 
                     folder = folder.Parent!;
-                }
-                else
-                {
-                    currentPath = currentPath.Append(directory).ToArray();
-                    if (folder.SubFolders != null)
-                        folder = folder.SubFolders.ToList().Find(x => x.Name == currentPath.Last())!;
-                }
-                currentDirectory = currentPath.Last();
+                else if (folder.SubFolders != null)
+                    folder = folder.SubFolders.ToList().Find(x => x.Name == dir)!;
             }
         }
 
@@ -607,126 +588,115 @@ public class Day
 
         void FolderLogic()
         {
-            if (foldersInCurrentFolder.Count != 0) MakeSubFolders();
-            if (sizeOfCurrentFolder != 0) SaveFolderSize();
+            if (foldersInCurrentFolder.Count > 0) MakeSubFolders();
+            if (sizeOfCurrentFolder > 0) SaveFolderSize();
+
+            void SaveFolderSize()
+            {
+                folder.Size = sizeOfCurrentFolder;
+                sizeOfCurrentFolder = 0;
+            }
+            void MakeSubFolders()
+            {
+                folder.AddMoreFolders(day, foldersInCurrentFolder);
+                foldersInCurrentFolder.Clear();
+            }
         }
 
-        void SaveFolderSize()
-        {
-            folder.Size = sizeOfCurrentFolder;
-            totalSizeOfRoot += sizeOfCurrentFolder;
-            sizeOfCurrentFolder = 0;
-        }
-        void MakeSubFolders()
-        {
-            folder.AddMoreFolders(day, foldersInCurrentFolder);
-            foldersInCurrentFolder.Clear();
-        }
+        //static void DebugPrintAllFolders(Day7.Folder f)
+        //{
+        //    string allAncestors = "";
+        //    while (f.Parent != null)
+        //    {
+        //        allAncestors = @$"{f.Parent.Name}/{allAncestors}";
+        //        f = f.Parent;
+        //    }
+        //    Console.WriteLine($"{allAncestors}{f.Name} {f.Size}");
+        //}
     }
 
-    void DebugPrintAllFolders(Day7.Folder f)
-    {
-        string allAncestors = "";
-        var temp = f;
-        while (temp.Parent != null)
-        {
-            allAncestors = @$"{temp.Parent.Name}/{allAncestors}";
-            temp = temp.Parent;
-        }
-
-        Console.WriteLine($"{allAncestors}{f.Name} {f.Size}");
-    }
+    
     #endregion
     #region Day 8
     private string Day8()
     {
         var grid = MakeGrid();
+        int l = grid.Length;
+        int x = 0;
+        int y = 0;
         int visible = 0;
         int highestScenicValue = 0;
-        GridMethod(grid);
+
+        foreach (var row in grid)
+        {
+            foreach (var tree in row)
+            {
+                CheckAllDirections(x, y, tree);
+                x++;
+                if (x == l) x = 0;
+            }
+            y++;
+            if (y == l) y = 0;
+        }
 
         if (Part == 1) return visible.ToString();
-        else return highestScenicValue.ToString();
+        else /* Part 2 */ return highestScenicValue.ToString();
 
 
-        void GridMethod(int[][] grid)
+        void CheckAllDirections(int col, int row, int input)
         {
-            int l = grid.Length;
-            int x = 0;
-            int y = 0;
-
-            foreach (var row in grid)
+            int temp = Part == 1 ? CheckLeft(row, col, input) + CheckRight(row, col, input) + CheckUp(row, col, input) + CheckDown(row, col, input):
+                                    CheckLeft(row, col, input) * CheckRight(row, col, input) * CheckUp(row, col, input) * CheckDown(row, col, input);
+            if (temp > 0)
             {
-                foreach (var value in row)
-                {
-                    if (CheckAllDirections(x, y, value)) visible++;
-                    x++;
-                    if (x == l) x = 0;
-                }
-                y++;
-                if (y == l) y = 0;
+                if (Part == 1) visible++;
+                else if (highestScenicValue < temp)
+                    highestScenicValue = temp;
             }
+        }
 
-            bool CheckAllDirections(int col, int row, int input)
+        int CheckLeft(int rowPos, int colPos, int input)
+        {
+            int distance = 0;
+            for (int col = colPos-1; col >= 0; col--)
             {
-                int templol = Part == 2 ? CheckLeft(row, col, input) * CheckRight(row, col, input) * CheckUp(row, col, input) * CheckDown(row, col, input) : CheckLeft(row, col, input) + CheckRight(row, col, input) + CheckUp(row, col, input) + CheckDown(row, col, input);
-
-                if (templol > 0)
-                {
-                    if (highestScenicValue < templol)
-                    {
-                        highestScenicValue = templol;
-                        Console.WriteLine($"col {col} row {row} scenic value {highestScenicValue}");
-                    }
-
-                    return true;
-                }
-                else return false;
+                distance++;
+                if (input <= grid[rowPos][col]) return Part == 1 ? 0 : distance;
             }
+            return Part == 1 ? 1 : distance;
+        }
 
-            int CheckLeft(int rowPos, int colPos, int input)
+        int CheckRight(int rowPos, int colPos, int input)
+        {
+            int distance = 0;
+            for (int col = colPos+1; col < l; col++)
             {
-                int distance = Part == 2 ? 0 : 1;
-                for (int col = colPos-1; col >= 0; col--)
-                {
-                    distance++;
-                    if (input <= grid[rowPos][col]) return Part == 2 ? distance : 0;
-                }
-                return distance;
+                distance++;
+                if (input <= grid[rowPos][col]) return Part == 1 ? 0 : distance;
             }
+            return Part == 1 ? 1 : distance;
+        }
 
-            int CheckRight(int rowPos, int colPos, int input)
+        int CheckUp(int rowPos, int colPos, int input)
+        {
+            int distance = 0;
+            for (int row = rowPos-1; row >= 0; row--)
             {
-                int distance = Part == 2 ? 0 : 1;
-                for (int col = colPos+1; col < l; col++)
-                {
-                    distance++;
-                    if (input <= grid[rowPos][col]) return Part == 2 ? distance : 0;
-                }
-                return distance;
+                distance++;
+                if (input <= grid[row][colPos]) return Part == 1 ? 0 : distance;
             }
+            return Part == 1 ? 1 : distance;
+        }
 
-            int CheckUp(int rowPos, int colPos, int input)
+        int CheckDown(int rowPos, int colPos, int input)
+        {
+            int distance = 0;
+            for (int row = rowPos+1; row < l; row++)
             {
-                int distance = Part == 2 ? 0 : 1;
-                for (int row = rowPos-1; row >= 0; row--)
-                {
-                    distance++;
-                    if (input <= grid[row][colPos]) return Part == 2 ? distance : 0;
-                }
-                return distance;
+                distance++;
+                if (input <= grid[row][colPos]) return Part == 1 ? 0 : distance;
             }
-
-            int CheckDown(int rowPos, int colPos, int input)
-            {
-                int distance = Part == 2 ? 0 : 1;
-                for (int row = rowPos+1; row < l; row++)
-                {
-                    distance++;
-                    if (input <= grid[row][colPos]) return Part == 2 ? distance : 0;
-                }
-                return distance;
-            } 
+            return Part == 1 ? 1 : distance;
         }
 
         int[][] MakeGrid()
@@ -737,9 +707,8 @@ public class Day
             foreach (var row in list)
             {
                 foreach (var c in row)
-                {
                     rowList.Add(int.Parse(c.ToString()));
-                }
+
                 gridList.Add(rowList.ToArray());
                 rowList.Clear();
             }
