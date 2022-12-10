@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Advent;
+﻿namespace Advent;
 
 public class Day
 {
@@ -41,6 +37,21 @@ public class Day
             8 => Day8(),
             9 => Day9(),
             10 => Day10(),
+            //11 => Day11(),
+            //12 => Day12(),
+            //13 => Day13(),
+            //14 => Day14(),
+            //15 => Day15(),
+            //16 => Day16(),
+            //17 => Day17(),
+            //18 => Day18(),
+            //19 => Day19(),
+            //20 => Day20(),
+            //21 => Day21(),
+            //22 => Day22(),
+            //23 => Day23(),
+            //24 => Day24(),
+            //25 => Day25(),
             _ => "oops"
         };
     }
@@ -82,295 +93,239 @@ public class Day
     private string Day2()
     {
         return Part == 1 ? Day2_Part1() : Day2_Part2();
-    }
-    private string Day2_Part1()
-    {
-        var list = InputFile.ToList();
-        int totalPointsEnemy = 0;
-        int totalPointsMe = 0;
 
-        foreach (string row in list)
+        string Day2_Part1()
         {
-            int pointsEnemy = 0;
-            int pointsMe = 0;
-            string[] moves = row.Split(" ");
-            if (moves[1] == "X") pointsMe++;      //Rock
-            if (moves[1] == "Y") pointsMe += 2;   //Paper
-            if (moves[1] == "Z") pointsMe += 3;   //Scissors
+            var list = InputFile.ToList();
+            int totalPointsEnemy = 0;
+            int totalPointsMe = 0;
 
-            if (moves[0] == "A") pointsEnemy++;      //Rock
-            if (moves[0] == "B") pointsEnemy += 2;   //Paper
-            if (moves[0] == "C") pointsEnemy += 3;   //Scissors
-
-            var outcome = CalculateWinner(moves[0], moves[1]);
-
-            if (outcome == "draw")
+            foreach (string row in list)
             {
-                pointsEnemy += 3;
-                pointsMe += 3;
-            }
+                int pointsEnemy = 0;
+                int pointsMe = 0;
+                string[] moves = row.Split(" ");
+                if (moves[1] == "X") pointsMe++;      //Rock
+                if (moves[1] == "Y") pointsMe += 2;   //Paper
+                if (moves[1] == "Z") pointsMe += 3;   //Scissors
 
-            if (outcome == "win")
-            {
-                pointsMe += 6;
-            }
+                if (moves[0] == "A") pointsEnemy++;      //Rock
+                if (moves[0] == "B") pointsEnemy += 2;   //Paper
+                if (moves[0] == "C") pointsEnemy += 3;   //Scissors
 
-            if (outcome == "loss")
-            {
-                pointsEnemy += 6;
-            }
+                var outcome = CalculateWinner(moves[0], moves[1]);
 
-            totalPointsEnemy += pointsEnemy;
-            totalPointsMe += pointsMe;
-        }
-
-        return totalPointsMe.ToString();
-
-        static string CalculateWinner(string boss, string me)
-        {
-            if (boss == "A") //Rock
-            {                       //vs
-                if (me == "X")      //Rock
-                    return "draw";
-                else if (me == "Y") //Paper
-                    return "win";
-                else //Z            Scissors
-                    return "loss";
-
-            }
-            else if (boss == "B")   //Paper
-            {
-                if (me == "X")
-                    return "loss";
-                else if (me == "Y")
-                    return "draw";
-                else //Z
-                    return "win";
-            }
-            else //C                Scissors
-            {
-                if (me == "X")
-                    return "win";
-                else if (me == "Y")
-                    return "loss";
-                else //Z
-                    return "draw";
-            }
-        }
-    }
-
-    private string Day2_Part2()
-    {
-        var list = InputFile.ToList();
-        int totalPointsEnemy = 0;
-        int totalPointsMe = 0;
-
-        foreach (string row in list)
-        {
-            int pointsEnemy = 0;
-            int pointsMe = 0;
-            string[] moves = row.Split(" ");
-
-            if (moves[0] == "A") pointsEnemy++;      //Rock
-            if (moves[0] == "B") pointsEnemy += 2;   //Paper
-            if (moves[0] == "C") pointsEnemy += 3;   //Scissors
-
-            var outcome = CalculateWinner(moves[0], moves[1]);
-
-            if (outcome == "draw")
-            {
-                pointsEnemy += 3;
-                pointsMe += 3;
-            }
-
-            if (outcome == "win")
-            {
-                pointsMe += 6;
-            }
-
-            if (outcome == "loss")
-            {
-                pointsEnemy += 6;
-            }
-
-            totalPointsEnemy += pointsEnemy;
-            totalPointsMe += pointsMe;
-
-            string CalculateWinner(string boss, string me)
-            {
-                if (boss == "A") //Rock
+                if (outcome == "draw")
                 {
-                    if (me == "X")
-                    {
-                        pointsMe += 3;
-                        return "loss";
-                    }
-                    else if (me == "Y")
-                    {
-                        pointsMe += 1;
-                        return "draw";
-                    }
-                    else //Z            Scissors
-                    {
-                        pointsMe += 2;
-                        return "win";
-                    }
+                    pointsEnemy += 3;
+                    pointsMe += 3;
                 }
 
+                if (outcome == "win")
+                {
+                    pointsMe += 6;
+                }
+
+                if (outcome == "loss")
+                {
+                    pointsEnemy += 6;
+                }
+
+                totalPointsEnemy += pointsEnemy;
+                totalPointsMe += pointsMe;
+            }
+
+            return totalPointsMe.ToString();
+
+            static string CalculateWinner(string boss, string me)
+            {
+                if (boss == "A") //Rock
+                {                       //vs
+                    if (me == "X")      //Rock
+                        return "draw";
+                    else if (me == "Y") //Paper
+                        return "win";
+                    else //Z            Scissors
+                        return "loss";
+
+                }
                 else if (boss == "B")   //Paper
                 {
                     if (me == "X")
-                    {
-                        pointsMe += 1;
                         return "loss";
-                    }
                     else if (me == "Y")
-                    {
-                        pointsMe += 2;
                         return "draw";
-                    }
                     else //Z
-                    {
-                        pointsMe += 3;
                         return "win";
-                    }
                 }
                 else //C                Scissors
                 {
                     if (me == "X")
-                    {
-                        pointsMe += 2;
-                        return "loss";
-                    }
-                    else if (me == "Y")
-                    {
-                        pointsMe += 3;
-                        return "draw";
-                    }
-                    else //Z
-                    {
-                        pointsMe += 1;
                         return "win";
-                    }
+                    else if (me == "Y")
+                        return "loss";
+                    else //Z
+                        return "draw";
                 }
             }
         }
 
-        return totalPointsMe.ToString();
+        string Day2_Part2()
+        {
+            var list = InputFile.ToList();
+            int totalPointsEnemy = 0;
+            int totalPointsMe = 0;
+
+            foreach (string row in list)
+            {
+                int pointsEnemy = 0;
+                int pointsMe = 0;
+                string[] moves = row.Split(" ");
+
+                if (moves[0] == "A") pointsEnemy++;      //Rock
+                if (moves[0] == "B") pointsEnemy += 2;   //Paper
+                if (moves[0] == "C") pointsEnemy += 3;   //Scissors
+
+                var outcome = CalculateWinner(moves[0], moves[1]);
+
+                if (outcome == "draw")
+                {
+                    pointsEnemy += 3;
+                    pointsMe += 3;
+                }
+
+                if (outcome == "win")
+                {
+                    pointsMe += 6;
+                }
+
+                if (outcome == "loss")
+                {
+                    pointsEnemy += 6;
+                }
+
+                totalPointsEnemy += pointsEnemy;
+                totalPointsMe += pointsMe;
+
+                string CalculateWinner(string boss, string me)
+                {
+                    if (boss == "A") //Rock
+                    {
+                        if (me == "X")
+                        {
+                            pointsMe += 3;
+                            return "loss";
+                        }
+                        else if (me == "Y")
+                        {
+                            pointsMe += 1;
+                            return "draw";
+                        }
+                        else //Z            Scissors
+                        {
+                            pointsMe += 2;
+                            return "win";
+                        }
+                    }
+
+                    else if (boss == "B")   //Paper
+                    {
+                        if (me == "X")
+                        {
+                            pointsMe += 1;
+                            return "loss";
+                        }
+                        else if (me == "Y")
+                        {
+                            pointsMe += 2;
+                            return "draw";
+                        }
+                        else //Z
+                        {
+                            pointsMe += 3;
+                            return "win";
+                        }
+                    }
+                    else //C                Scissors
+                    {
+                        if (me == "X")
+                        {
+                            pointsMe += 2;
+                            return "loss";
+                        }
+                        else if (me == "Y")
+                        {
+                            pointsMe += 3;
+                            return "draw";
+                        }
+                        else //Z
+                        {
+                            pointsMe += 1;
+                            return "win";
+                        }
+                    }
+                }
+            }
+
+            return totalPointsMe.ToString();
+        }
     }
     #endregion
-    #region Day 3 (refactor)
+    #region Day 3
     private string Day3()
     {
         var list = InputFile.ToList();
         int prioTotal = 0;
+        var listOf3Rucksacks = new List<string>();
+        int counter = 0;
 
-        if (Part == 1) DoPart1();
-        else DoPart2();
-
-        return prioTotal.ToString();
-
-        void DoPart1()
+        foreach (string rucksack in list)
         {
-            foreach (string rucksack in list)
+            if (Part == 1)
             {
                 int length = rucksack.Length / 2;
-                var compartment1 = rucksack[..length];
-                var compartment2 = rucksack[length..];
+                var firstCompartment = rucksack[..length];
+                var secondCompartment = rucksack[length..];
 
-                prioTotal += GetCharPoints(GetChar());
-
-                char GetChar()
-                {
-                    foreach (char c in compartment1)
-                    {
-                        foreach (char t in compartment2)
-                            if (c == t) return c;
-                    }
-                    return '.';
-                }
+                prioTotal += GetCharPoints(firstCompartment, secondCompartment);
             }
-        }
 
-        void DoPart2()
-        {
-            var listOf3Rucksacks = new List<string>();
-            int counter = 0;
-
-            foreach (string rucksack in list)
+            if (Part == 2)
             {
                 counter++;
                 listOf3Rucksacks.Add(rucksack);
 
                 if (counter == 3)
                 {
-                    var compartment1 = listOf3Rucksacks[0];
-                    var compartment2 = listOf3Rucksacks[1];
-                    var compartment3 = listOf3Rucksacks[2];
+                    var firstSack = listOf3Rucksacks[0];
+                    var secondSack = listOf3Rucksacks[1];
+                    var thirdSack = listOf3Rucksacks[2];
 
                     counter = 0;
                     listOf3Rucksacks.Clear();
 
-                    prioTotal += GetCharPoints(GetChar());
-
-                    char GetChar()
-                    {
-                        foreach (char c in compartment1)
-                        {
-                            foreach (char d in compartment2)
-                            {
-                                if (c == d)
-                                {
-                                    foreach (char e in compartment3)
-                                    {
-                                        if (e == d) return e;
-                                    }
-                                }
-                            }
-                        }
-                        return '.';
-                    }
+                    prioTotal += GetCharPoints(firstSack, secondSack, thirdSack);
                 }
             }
         }
 
-        int GetCharPoints(char c)
-        {
-            return char.IsUpper(c) ? CharScorer(char.ToLower(c)) + 26 : CharScorer(c);
-        }
+        return prioTotal.ToString();
 
-        static int CharScorer(char c)
+        static int GetCharPoints(string one, string two, string? three = null)
         {
-            return c switch
+            foreach (char c in one)
             {
-                'a' => 1,
-                'b' => 2,
-                'c' => 3,
-                'd' => 4,
-                'e' => 5,
-                'f' => 6,
-                'g' => 7,
-                'h' => 8,
-                'i' => 9,
-                'j' => 10,
-                'k' => 11,
-                'l' => 12,
-                'm' => 13,
-                'n' => 14,
-                'o' => 15,
-                'p' => 16,
-                'q' => 17,
-                'r' => 18,
-                's' => 19,
-                't' => 20,
-                'u' => 21,
-                'v' => 22,
-                'w' => 23,
-                'x' => 24,
-                'y' => 25,
-                'z' => 26,
-                _ => 0
-            };
+                foreach (char d in two)
+                {
+                    if (d == c)
+                    {
+                        if (three == null) return char.IsUpper(d) ? d - 38 : d - 96;
+                        else foreach(char e in three)
+                                if (e == d) return char.IsUpper(e) ? e - 38 : e - 96;
+                    }
+                }   
+            }
+            return 0;
         }
     }
     #endregion
@@ -544,17 +499,17 @@ public class Day
 
         int freeSpace = 70000000 - day.List[0].Size;
         int spaceNeeded = 30000000 - freeSpace;
-        List<int> d = new();
+        List<int> bigEnough = new();
         foreach (Day7.Folder? f in day.List!)
         {
             //DebugPrintAllFolders(f);
             if (Part == 1 && !f.TooBig) totalCount += f.Size;
-            if (Part == 2 && f.Size >= spaceNeeded) d.Add(f.Size);
+            if (Part == 2 && f.Size >= spaceNeeded) bigEnough.Add(f.Size);
         }
-        string closest = Part == 2 ? d.OrderBy(item => Math.Abs(spaceNeeded - item)).First().ToString() : "";
+        int closest = Part == 2 ? bigEnough.Order().First() : 0;
 
         if (Part == 1)    return totalCount.ToString();
-        else /* Part 2 */ return closest;
+        else /* Part 2 */ return closest.ToString();
 
 
         void ParseLine(string line)
@@ -742,6 +697,24 @@ public class Day
     private string Day10()
     {
         var list = InputFile.ToList();
+        foreach (var line in list)
+        {
+
+        }
+
+        return "";
+    }
+    #endregion
+
+    #region Day Template
+    private string DayX()
+    {
+        var list = InputFile.ToList();
+        foreach (var line in list)
+        {
+
+        }
+
         return "";
     }
     #endregion
