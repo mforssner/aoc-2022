@@ -40,7 +40,7 @@ public class Day
             9 => Day9(),
             10 => Day10(),
             11 => Day11(),
-            //12 => Day12(),
+            12 => Day12(),
             //13 => Day13(),
             //14 => Day14(),
             //15 => Day15(),
@@ -69,9 +69,7 @@ public class Day
         foreach (string line in startingList)
         {
             if (line.Any())
-            {
                 sumOfCalories += int.Parse(line);
-            }
             else
             {
                 listOfSums.Add(sumOfCalories);
@@ -797,7 +795,18 @@ public class Day
         return "";
     }
     #endregion
+    #region Day 12
+    private string Day12()
+    {
+        var list = InputFile.ToList();
+        foreach (var line in list)
+        {
 
+        }
+
+        return "";
+    }
+    #endregion
 
     #region Day Template
     private string DayX()
