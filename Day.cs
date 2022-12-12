@@ -791,10 +791,6 @@ public class Day
     private string Day11()
     {
         var list = InputFile.ToList();
-        foreach (var line in list)
-        {
-
-        }
 
         return "";
     }
@@ -803,49 +799,49 @@ public class Day
     private string Day12()
     {
         var grid = MakeGrid();
-        var boolGrid = MakeBoolGrid(grid.Length);
         var startPos = FindStartPosition(grid);
         grid[startPos[0]][startPos[1]] = 'a';
         int currentLowestNumberOfSteps = 1000;
-        int stepCounter = 0;
         int numberOfSimulations = 0;
+        int simulationDepth = 0;
 
-        Simulate(startPos, boolGrid, stepCounter);
+        Simulate(startPos, MakeBoolGrid(grid.Length), 0, 0);
 
         Console.WriteLine(numberOfSimulations);
         return currentLowestNumberOfSteps.ToString();
 
 
-        void Simulate(int[] pos, bool[][] visited, int steps)
+        void Simulate(int[] pos, bool[][] visited, int steps, int depth)
         {
+            depth++;
             numberOfSimulations++;
             visited[pos[0]][pos[1]] = true;
-
+            Console.WriteLine(grid[pos[0]][pos[1]]);
             if (grid[pos[0]][pos[1]] != 'E')
             {
-                if (Look('L', pos, visited))
+                if (Look('L', pos.ToArray(), visited))
                 {
                     steps++;
                     pos[1]--;
-                    Simulate(pos, visited, steps);
+                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
                 }
-                if (Look('R', pos, visited))
+                if (Look('R', pos.ToArray(), visited))
                 {
                     steps++;
                     pos[1]++;
-                    Simulate(pos, visited, steps);
+                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
                 }
-                if (Look('U', pos, visited))
+                if (Look('U', pos.ToArray(), visited))
                 {
                     steps++;
                     pos[0]--;
-                    Simulate(pos, visited, steps);
+                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
                 }
-                if (Look('D', pos, visited))
+                if (Look('D', pos.ToArray(), visited))
                 {
                     steps++;
                     pos[0]++;
-                    Simulate(pos, visited, steps);
+                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
                 }
             }
             else if (steps < currentLowestNumberOfSteps) currentLowestNumberOfSteps = steps;
@@ -858,27 +854,23 @@ public class Day
             switch (direction)
             {
                 case 'L':
-                    x = x - 1;
+                    x--;
                     break;
                 case 'R':
-                    x = x + 1;
+                    x++;
                     break;
                 case 'U':
-                    y = y - 1;
+                    y--;
                     break;
                 case 'D':
-                    y = y + 1;
-                    break;
-
-                default:
+                    y++;
                     break;
             }
             
             try
             {
-                var posToCheck = grid[y][x];
-                var myPos = grid[pos[0]][pos[1]];
-                return posToCheck <= myPos + 1 && !visited[y][x];
+                bool vis = visited[y][x];
+                return grid[y][x] <= grid[pos[0]][pos[1]] + 1 && !visited[y][x];
             }
             catch { return false; }
         }
@@ -924,14 +916,13 @@ public class Day
     }
     #endregion
 
+
+
+
     #region Day Template
     private string DayX()
     {
         var list = InputFile.ToList();
-        foreach (var line in list)
-        {
-
-        }
 
         return "";
     }
