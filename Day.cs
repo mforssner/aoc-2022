@@ -800,34 +800,56 @@ public class Day
     {
         var grid = MakeGrid();
         var startPos = FindStartPosition(grid);
-        grid[startPos[0]][startPos[1]] = 'a';
         int currentLowestNumberOfSteps = 1000;
         int numberOfSimulatedSteps = 0;
 
         SimulateStep(startPos, MakeBoolGrid(grid.Length), 0, 0);
 
-        Console.WriteLine(numberOfSimulatedSteps);
+        Console.WriteLine($"Steps simulated: {numberOfSimulatedSteps}");
         return currentLowestNumberOfSteps.ToString();
 
 
         void SimulateStep(int[] pos, bool[][] visited, int steps, int depth, char? dir = null)
         {
-            var lastDirection = dir;
             depth++;
             numberOfSimulatedSteps++;
-            visited[pos[0]][pos[1]] = true;
-            Console.WriteLine($"[{pos[0]}][{pos[1]}] {grid[pos[0]][pos[1]]}");
+            bool[][] vis2 = new bool[visited.Length][];
+            Array.Copy(visited, vis2, visited.Length);
+            vis2[pos[0]][pos[1]] = true;
+            //Console.WriteLine($"[{pos[0]}][{pos[1]}] {grid[pos[0]][pos[1]]}");
             if (grid[pos[0]][pos[1]] != 'E')
             {
-                Look('L', pos.ToArray(), visited, steps, depth);
-                Look('R', pos.ToArray(), visited, steps, depth);
-                Look('U', pos.ToArray(), visited, steps, depth);
-                Look('D', pos.ToArray(), visited, steps, depth);
+                var lookLeft = Look('L', pos.ToArray(), vis2.ToArray(), steps, depth);
+                var lookRight = Look('R', pos.ToArray(), vis2.ToArray(), steps, depth);
+                var lookDown = Look('D', pos.ToArray(), vis2.ToArray(), steps, depth);
+                var lookUp = Look('U', pos.ToArray(), vis2.ToArray(), steps, depth);
+                if (lookRight + lookLeft + lookUp + lookDown == 48*4 /* 4 nollor */)
+                {
+                    PrintMap(visited, pos);
+                }
             }
+
             else if (steps < currentLowestNumberOfSteps) currentLowestNumberOfSteps = steps;
         }
 
-        void Look(char direction, int[] pos, bool[][] visited, int steps, int depth)
+        void PrintMap(bool[][] visited, int[] pos)
+        {
+            Console.WriteLine("\n\n");
+            string str = string.Empty;
+            for (int i = 0; i < visited.Length; i++)
+            {
+                for (int j = 0; j < visited.Length; j++)
+                {
+                    if (i == pos[0] && j == pos[1]) str += 'O';
+                    if (i == startPos[0] && j == startPos[1]) str += 'S';
+                    else str += visited[i][j] == true ? "." : "#";
+                }
+                Console.WriteLine(str);
+                str = string.Empty;
+            }
+        }
+
+        char Look(char direction, int[] pos, bool[][] visited, int steps, int depth)
         {
             int y = pos[0];
             int x = pos[1];
@@ -847,32 +869,31 @@ public class Day
                     break;
             }
             
-            try
+            if (x < 0 || y < 0 || x > 40 || y > 40) { return '0'; }
+
+            var current = grid[pos[0]][pos[1]];
+            var checking = grid[y][x];
+
+            if (checking <= current + 1 && !visited[y][x])
             {
-                var current = grid[pos[0]][pos[1]];
-                var checking = grid[y][x];
-
-                if (checking == 'd')
-                {
-                    //pos[0]++;
-                }
-
-                if (grid[pos[0]][pos[1]] <= grid[y][x] + 1 && !visited[y][x])
-                {
-                    steps++;
-                    pos[0] = y;
-                    pos[1] = x;
-                    SimulateStep(pos.ToArray(), visited.ToArray(), steps, depth, direction);
-                }
+                bool[][] vis2 = new bool[visited.Length][];
+                Array.Copy(visited, vis2, visited.Length);
+                steps++;
+                SimulateStep(new int[] {y, x}, vis2, steps, depth, direction);
+                return current;
             }
-            catch { return; }
+            return '0';
         }
 
         int[] FindStartPosition(char[][] grid)
         {
             for (int i = 0; i < grid.Length; i++)
                 for (int j = 0; j < grid[i].Length; j++)
-                    if (grid[i][j] == 'S') return new int[] { i, j };
+                    if (grid[i][j] == 'S')
+                    {
+                        grid[i][j] = 'a';
+                        return new int[] { i, j };
+                    }
             return new int[] { 0, 0 };
         }
 
