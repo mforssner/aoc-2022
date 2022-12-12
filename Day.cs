@@ -802,55 +802,35 @@ public class Day
         var startPos = FindStartPosition(grid);
         grid[startPos[0]][startPos[1]] = 'a';
         int currentLowestNumberOfSteps = 1000;
-        int numberOfSimulations = 0;
-        int simulationDepth = 0;
+        int numberOfSimulatedSteps = 0;
 
-        Simulate(startPos, MakeBoolGrid(grid.Length), 0, 0);
+        SimulateStep(startPos, MakeBoolGrid(grid.Length), 0, 0);
 
-        Console.WriteLine(numberOfSimulations);
+        Console.WriteLine(numberOfSimulatedSteps);
         return currentLowestNumberOfSteps.ToString();
 
 
-        void Simulate(int[] pos, bool[][] visited, int steps, int depth)
+        void SimulateStep(int[] pos, bool[][] visited, int steps, int depth, char? dir = null)
         {
+            var lastDirection = dir;
             depth++;
-            numberOfSimulations++;
+            numberOfSimulatedSteps++;
             visited[pos[0]][pos[1]] = true;
-            Console.WriteLine(grid[pos[0]][pos[1]]);
+            Console.WriteLine($"[{pos[0]}][{pos[1]}] {grid[pos[0]][pos[1]]}");
             if (grid[pos[0]][pos[1]] != 'E')
             {
-                if (Look('L', pos.ToArray(), visited))
-                {
-                    steps++;
-                    pos[1]--;
-                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
-                }
-                if (Look('R', pos.ToArray(), visited))
-                {
-                    steps++;
-                    pos[1]++;
-                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
-                }
-                if (Look('U', pos.ToArray(), visited))
-                {
-                    steps++;
-                    pos[0]--;
-                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
-                }
-                if (Look('D', pos.ToArray(), visited))
-                {
-                    steps++;
-                    pos[0]++;
-                    Simulate(pos.ToArray(), visited.ToArray(), steps, depth);
-                }
+                Look('L', pos.ToArray(), visited, steps, depth);
+                Look('R', pos.ToArray(), visited, steps, depth);
+                Look('U', pos.ToArray(), visited, steps, depth);
+                Look('D', pos.ToArray(), visited, steps, depth);
             }
             else if (steps < currentLowestNumberOfSteps) currentLowestNumberOfSteps = steps;
         }
 
-        bool Look(char direction, int[] pos, bool[][] visited)
+        void Look(char direction, int[] pos, bool[][] visited, int steps, int depth)
         {
-            var x = pos[1];
-            var y = pos[0];
+            int y = pos[0];
+            int x = pos[1];
             switch (direction)
             {
                 case 'L':
@@ -869,10 +849,23 @@ public class Day
             
             try
             {
-                bool vis = visited[y][x];
-                return grid[y][x] <= grid[pos[0]][pos[1]] + 1 && !visited[y][x];
+                var current = grid[pos[0]][pos[1]];
+                var checking = grid[y][x];
+
+                if (checking == 'd')
+                {
+                    //pos[0]++;
+                }
+
+                if (grid[pos[0]][pos[1]] <= grid[y][x] + 1 && !visited[y][x])
+                {
+                    steps++;
+                    pos[0] = y;
+                    pos[1] = x;
+                    SimulateStep(pos.ToArray(), visited.ToArray(), steps, depth, direction);
+                }
             }
-            catch { return false; }
+            catch { return; }
         }
 
         int[] FindStartPosition(char[][] grid)
