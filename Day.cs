@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.Metrics;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.Metrics;
 
 namespace Advent;
 
@@ -69,7 +71,9 @@ public class Day
         foreach (string line in startingList)
         {
             if (line.Any())
+            {
                 sumOfCalories += int.Parse(line);
+            }
             else
             {
                 listOfSums.Add(sumOfCalories);
@@ -508,8 +512,8 @@ public class Day
         }
         int closest = Part == 2 ? bigEnough.Order().First() : 0;
 
-        if (Part == 1)    return totalCount.ToString();
-        else /* Part 2 */ return closest.ToString();
+        return (Part == 1) ? totalCount.ToString(): 
+             /* Part == 2 */ closest.ToString();
 
 
         void ParseLine(string line)
@@ -573,7 +577,7 @@ public class Day
 
 
     #endregion
-    #region Day 8 (refactor)
+    #region Day 8 (refactor needed!)
     private string Day8()
     {
         var grid = MakeGrid();
@@ -605,8 +609,8 @@ public class Day
                                     CheckLeft(row, col, input) * CheckRight(row, col, input) * CheckUp(row, col, input) * CheckDown(row, col, input);
             if (temp > 0)
             {
-                if (Part == 1) visible++;
-                else if (highestScenicValue < temp)
+                visible++;
+                if (highestScenicValue < temp)
                     highestScenicValue = temp;
             }
         }
@@ -798,13 +802,125 @@ public class Day
     #region Day 12
     private string Day12()
     {
-        var list = InputFile.ToList();
-        foreach (var line in list)
-        {
+        var grid = MakeGrid();
+        var boolGrid = MakeBoolGrid(grid.Length);
+        var startPos = FindStartPosition(grid);
+        grid[startPos[0]][startPos[1]] = 'a';
+        int currentLowestNumberOfSteps = 1000;
+        int stepCounter = 0;
+        int numberOfSimulations = 0;
 
+        Simulate(startPos, boolGrid, stepCounter);
+
+        Console.WriteLine(numberOfSimulations);
+        return currentLowestNumberOfSteps.ToString();
+
+
+        void Simulate(int[] pos, bool[][] visited, int steps)
+        {
+            numberOfSimulations++;
+            visited[pos[0]][pos[1]] = true;
+
+            if (grid[pos[0]][pos[1]] != 'E')
+            {
+                if (Look('L', pos, visited))
+                {
+                    steps++;
+                    pos[1]--;
+                    Simulate(pos, visited, steps);
+                }
+                if (Look('R', pos, visited))
+                {
+                    steps++;
+                    pos[1]++;
+                    Simulate(pos, visited, steps);
+                }
+                if (Look('U', pos, visited))
+                {
+                    steps++;
+                    pos[0]--;
+                    Simulate(pos, visited, steps);
+                }
+                if (Look('D', pos, visited))
+                {
+                    steps++;
+                    pos[0]++;
+                    Simulate(pos, visited, steps);
+                }
+            }
+            else if (steps < currentLowestNumberOfSteps) currentLowestNumberOfSteps = steps;
         }
 
-        return "";
+        bool Look(char direction, int[] pos, bool[][] visited)
+        {
+            var x = pos[1];
+            var y = pos[0];
+            switch (direction)
+            {
+                case 'L':
+                    x = x - 1;
+                    break;
+                case 'R':
+                    x = x + 1;
+                    break;
+                case 'U':
+                    y = y - 1;
+                    break;
+                case 'D':
+                    y = y + 1;
+                    break;
+
+                default:
+                    break;
+            }
+            
+            try
+            {
+                var posToCheck = grid[y][x];
+                var myPos = grid[pos[0]][pos[1]];
+                return posToCheck <= myPos + 1 && !visited[y][x];
+            }
+            catch { return false; }
+        }
+
+        int[] FindStartPosition(char[][] grid)
+        {
+            for (int i = 0; i < grid.Length; i++)
+                for (int j = 0; j < grid[i].Length; j++)
+                    if (grid[i][j] == 'S') return new int[] { i, j };
+            return new int[] { 0, 0 };
+        }
+
+        char[][] MakeGrid()
+        {
+            string[] list = InputFile;
+            List<char[]> gridList = new();
+            List<char> rowList = new();
+            foreach (string row in list)
+            {
+                foreach (var c in row)
+                    rowList.Add(c);
+
+                gridList.Add(rowList.ToArray());
+                rowList.Clear();
+            }
+            return gridList.ToArray();
+        }
+
+        bool[][] MakeBoolGrid(int length)
+        {
+            List<bool[]> gridList = new();
+            List<bool> rowList = new();
+            for (int i = 0; i < length; i++)
+            {
+                for (int j = 0; j < length; j++)
+                    rowList.Add(false);
+
+                gridList.Add(rowList.ToArray());
+                rowList.Clear();
+            }
+            return gridList.ToArray();
+        }
     }
     #endregion
 
