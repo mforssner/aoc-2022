@@ -43,8 +43,8 @@ public class Day
             10 => Day10(),
             11 => Day11(),
             12 => Day12(),
-            //13 => Day13(),
-            //14 => Day14(),
+            13 => Day13(),
+            14 => Day14(),
             //15 => Day15(),
             //16 => Day16(),
             //17 => Day17(),
@@ -795,7 +795,7 @@ public class Day
         return "";
     }
     #endregion
-    #region Day 12
+    #region Day 12 (Not done, buggy mess)
     private string Day12()
     {
         var grid = MakeGrid();
@@ -809,20 +809,18 @@ public class Day
         return currentLowestNumberOfSteps.ToString();
 
 
-        void SimulateStep(int[] pos, bool[][] visited, int steps, int depth, char? dir = null)
+        void SimulateStep(int[] pos, List<List<bool>> visited, int steps, int depth, char? dir = null)
         {
             depth++;
             numberOfSimulatedSteps++;
-            bool[][] vis2 = new bool[visited.Length][];
-            Array.Copy(visited, vis2, visited.Length);
-            vis2[pos[0]][pos[1]] = true;
+            visited[pos[0]][pos[1]] = true;
             //Console.WriteLine($"[{pos[0]}][{pos[1]}] {grid[pos[0]][pos[1]]}");
             if (grid[pos[0]][pos[1]] != 'E')
             {
-                var lookLeft = Look('L', pos.ToArray(), vis2.ToArray(), steps, depth);
-                var lookRight = Look('R', pos.ToArray(), vis2.ToArray(), steps, depth);
-                var lookDown = Look('D', pos.ToArray(), vis2.ToArray(), steps, depth);
-                var lookUp = Look('U', pos.ToArray(), vis2.ToArray(), steps, depth);
+                var lookDown = Look('D', pos.ToArray(), visited, steps, depth);
+                var lookRight = Look('R', pos.ToArray(), visited, steps, depth);
+                var lookLeft = Look('L', pos.ToArray(), visited, steps, depth);
+                var lookUp = Look('U', pos.ToArray(), visited, steps, depth);
                 if (lookRight + lookLeft + lookUp + lookDown == 48*4 /* 4 nollor */)
                 {
                     PrintMap(visited, pos);
@@ -832,16 +830,16 @@ public class Day
             else if (steps < currentLowestNumberOfSteps) currentLowestNumberOfSteps = steps;
         }
 
-        void PrintMap(bool[][] visited, int[] pos)
+        void PrintMap(List<List<bool>> visited, int[] pos)
         {
             Console.WriteLine("\n\n");
             string str = string.Empty;
-            for (int i = 0; i < visited.Length; i++)
+            for (int i = 0; i < visited.Count; i++)
             {
-                for (int j = 0; j < visited.Length; j++)
+                for (int j = 0; j < visited.Count; j++)
                 {
                     if (i == pos[0] && j == pos[1]) str += 'O';
-                    if (i == startPos[0] && j == startPos[1]) str += 'S';
+                    else if (i == startPos[0] && j == startPos[1]) str += 'S';
                     else str += visited[i][j] == true ? "." : "#";
                 }
                 Console.WriteLine(str);
@@ -849,7 +847,7 @@ public class Day
             }
         }
 
-        char Look(char direction, int[] pos, bool[][] visited, int steps, int depth)
+        char Look(char direction, int[] pos, List<List<bool>> visited, int steps, int depth)
         {
             int y = pos[0];
             int x = pos[1];
@@ -876,10 +874,8 @@ public class Day
 
             if (checking <= current + 1 && !visited[y][x])
             {
-                bool[][] vis2 = new bool[visited.Length][];
-                Array.Copy(visited, vis2, visited.Length);
                 steps++;
-                SimulateStep(new int[] {y, x}, vis2, steps, depth, direction);
+                SimulateStep(new int[] {y, x}, visited, steps, depth, direction);
                 return current;
             }
             return '0';
@@ -913,24 +909,37 @@ public class Day
             return gridList.ToArray();
         }
 
-        bool[][] MakeBoolGrid(int length)
+        List<List<bool>> MakeBoolGrid(int length)
         {
-            List<bool[]> gridList = new();
+            List<List<bool>> gridList = new();
             List<bool> rowList = new();
+            for (int j = 0; j < length; j++)
+                rowList.Add(false);
+
             for (int i = 0; i < length; i++)
             {
-                for (int j = 0; j < length; j++)
-                    rowList.Add(false);
-
-                gridList.Add(rowList.ToArray());
-                rowList.Clear();
+                gridList.Add(rowList);
             }
-            return gridList.ToArray();
+            return gridList;
         }
     }
     #endregion
+    #region Day 13 (Not done)
+    private string Day13()
+    {
+        var list = InputFile.ToList();
 
+        return "";
+    }
+    #endregion
+    #region Day 14 (Not done)
+    private string Day14()
+    {
+        var list = InputFile.ToList();
 
+        return "";
+    }
+    #endregion
 
 
     #region Day Template
